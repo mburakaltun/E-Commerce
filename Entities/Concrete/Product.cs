@@ -11,7 +11,7 @@ namespace Entities.Concrete
 
         public int CategoryID { get; set; }
 
-        public String ProductName { get; set; }
+        public string ProductName { get; set; }
 
         public short UnitsInStock { get; set; }
 
