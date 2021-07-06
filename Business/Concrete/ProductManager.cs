@@ -3,30 +3,61 @@ using Business.Constants;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
 using Core.CrossCuttingConserns.Validation;
+using Core.Utilities.Business;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
+using DataAccess.Concrete.EntityFramework;
 using Entities.Concrete;
 using Entities.DTOs;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Business.Concrete
 {
     public class ProductManager : IProductService
     {
         IProductDal _productDal;
+        ICategoryService _categoryService;
 
-        public ProductManager(IProductDal productDal)
+        public ProductManager(IProductDal productDal, ICategoryService categoryService)
         {
             _productDal = productDal;
+            _categoryService = categoryService;
         }
 
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
+            IResult result = BusinessRules.Run(
+                CheckIfProductCountOfCategoryCorrect(product.CategoryID),
+                CheckIfProductNameIsExists(product.ProductName)
+                );
+
+            if(result != null)
+            {
+                return result;
+            }
             _productDal.Add(product);
-            return new SuccessResult(Messages.ProductAdded);
+            return new SuccessResult();
+
+        }
+
+        [ValidationAspect(typeof(ProductValidator))]
+        public IResult Update(Product product)
+        {
+            IResult result = BusinessRules.Run(
+                CheckIfProductCountOfCategoryCorrect(product.CategoryID),
+                CheckIfProductNameIsExists(product.ProductName)
+                );
+
+            if (result != null)
+            {
+                return result;
+            }
+            _productDal.Update(product);
+            return new SuccessResult();
         }
 
         public IDataResult<List<Product>> GetAll()
@@ -60,6 +91,38 @@ namespace Business.Concrete
                 return new ErrorDataResult<List<ProductDetailDTO>>(Messages.MaintenanceTime);
             }
             return new SuccessDataResult<List<ProductDetailDTO>>(_productDal.GetProductDetails());
+        }
+
+
+        private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)
+        {
+            var result = _productDal.GetAll(p => p.CategoryID == categoryId);
+            if (result.Count >= 10)
+            {
+                return new ErrorResult(Messages.ProductMaximumNumberOfCategoryReachedError);
+            }
+            return new SuccessResult();
+        }
+
+        private IResult CheckIfProductNameIsExists(string name)
+        {
+            var result = _productDal.GetAll(p => p.ProductName == name).Any();
+            if(result)
+            {
+                return new ErrorResult(Messages.ProductNameExistsError);
+            }
+            return new SuccessResult();
+        }
+
+        private IResult CheckIfCategoryCountIsCorrect(int categoryId)
+        {
+            var count = _categoryService.GetAll().Data.Count;
+            if (count >= 15)
+            {
+                return new ErrorResult(Messages.CategoryLimitExceeded);
+            }
+            return new SuccessResult();
+
         }
     }
 }

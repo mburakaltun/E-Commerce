@@ -14,5 +14,11 @@ namespace Business.Constants
         public static string MaintenanceTime = "System in maintenance";
 
         public static string ProductsListed = "Products listed";
+
+        public static string ProductMaximumNumberOfCategoryReachedError = "Maximum number for specified category has been reached!";
+
+        public  static string ProductNameExistsError = "Product Name Already Exists!";
+
+        public  static string CategoryLimitExceeded = "Maximum number for category has been reached!";
     }
 }
