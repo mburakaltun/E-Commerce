@@ -2,6 +2,7 @@
 using Business.BusinessAspects.Autofac;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Caching;
 using Core.Aspects.Autofac.Validation;
 using Core.CrossCuttingConserns.Validation;
 using Core.Utilities.Business;
@@ -11,6 +12,7 @@ using DataAccess.Concrete.EntityFramework;
 using Entities.Concrete;
 using Entities.DTOs;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +30,8 @@ namespace Business.Concrete
             _categoryService = categoryService;
         }
 
-        [SecuredOperation("product.add,admin")]
+        [CacheRemoveAspect("IProductService.Get")]
+        //[SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
@@ -46,6 +49,7 @@ namespace Business.Concrete
 
         }
 
+        [CacheRemoveAspect("IProductService.Get")]
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Update(Product product)
         {
@@ -62,6 +66,8 @@ namespace Business.Concrete
             return new SuccessResult();
         }
 
+        //[SecuredOperation("product.getAll")]
+        [CacheAspect(duration:10)]
         public IDataResult<List<Product>> GetAll()
         {
             if (DateTime.Now.Hour == 05) 
@@ -71,21 +77,25 @@ namespace Business.Concrete
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(), Messages.ProductsListed);
         }
 
+        [CacheAspect(duration: 10)]
         public IDataResult<List<Product>> GetAllByCategoryID(int ID)
         {
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(p=>p.CategoryID==ID));
         }
 
+        [CacheAspect(duration: 10)]
         public IDataResult<Product> GetById(int productId)
         {
             return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductID == productId));
         }
 
+        [CacheAspect(duration: 10)]
         public IDataResult<List<Product>> GetByUnitPrice(decimal min, decimal max)
         {
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(p=>p.UnitPrice <= max && p.UnitPrice >= min));
         }
 
+        [CacheAspect(duration: 10)]
         public IDataResult<List<ProductDetailDTO>> GetProductDetails()
         {
             if (DateTime.Now.Hour == 02)
