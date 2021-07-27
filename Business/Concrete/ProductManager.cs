@@ -36,7 +36,7 @@ namespace Business.Concrete
         public IResult Add(Product product)
         {
             IResult result = BusinessRules.Run(
-                CheckIfProductCountOfCategoryCorrect(product.CategoryID),
+                CheckIfProductCountOfCategoryCorrect(product.CategoryId),
                 CheckIfProductNameIsExists(product.ProductName)
                 );
 
@@ -54,7 +54,7 @@ namespace Business.Concrete
         public IResult Update(Product product)
         {
             IResult result = BusinessRules.Run(
-                CheckIfProductCountOfCategoryCorrect(product.CategoryID),
+                CheckIfProductCountOfCategoryCorrect(product.CategoryId),
                 CheckIfProductNameIsExists(product.ProductName)
                 );
 
@@ -80,13 +80,13 @@ namespace Business.Concrete
         [CacheAspect(duration: 10)]
         public IDataResult<List<Product>> GetAllByCategoryID(int ID)
         {
-            return new SuccessDataResult<List<Product>>(_productDal.GetAll(p=>p.CategoryID==ID));
+            return new SuccessDataResult<List<Product>>(_productDal.GetAll(p=>p.CategoryId==ID));
         }
 
         [CacheAspect(duration: 10)]
         public IDataResult<Product> GetById(int productId)
         {
-            return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductID == productId));
+            return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductId == productId));
         }
 
         [CacheAspect(duration: 10)]
@@ -108,7 +108,7 @@ namespace Business.Concrete
 
         private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)
         {
-            var result = _productDal.GetAll(p => p.CategoryID == categoryId);
+            var result = _productDal.GetAll(p => p.CategoryId == categoryId);
             if (result.Count >= 10)
             {
                 return new ErrorResult(Messages.ProductMaximumNumberOfCategoryReachedError);
