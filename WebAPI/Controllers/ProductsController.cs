@@ -30,7 +30,7 @@ namespace WebAPI.Controllers
         public IActionResult GetAll()
         {
 
-            Thread.Sleep(5000);
+            Thread.Sleep(1000);
             var result = _productService.GetAll();
             if(result.Success)
             {
@@ -53,9 +53,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("getallbycategoryid")]
-        public IActionResult GetAllByCategoryId(int id)
+        public IActionResult GetAllByCategoryId(int categoryId)
         {
-            var result = _productService.GetAllByCategoryID(id);
+            var result = _productService.GetAllByCategoryId(categoryId);
             if (result.Success)
             {
                 return Ok(result);

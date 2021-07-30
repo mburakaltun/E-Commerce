@@ -78,7 +78,7 @@ namespace Business.Concrete
         }
 
         [CacheAspect(duration: 10)]
-        public IDataResult<List<Product>> GetAllByCategoryID(int ID)
+        public IDataResult<List<Product>> GetAllByCategoryId(int ID)
         {
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(p=>p.CategoryId==ID));
         }

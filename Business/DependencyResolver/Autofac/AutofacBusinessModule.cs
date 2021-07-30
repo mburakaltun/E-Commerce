@@ -14,6 +14,7 @@ using System.Text;
 namespace Business.DependencyResolver.Autofac
 {
     public class AutofacBusinessModule : Module
+
     {
         protected override void Load(ContainerBuilder builder)
         {
